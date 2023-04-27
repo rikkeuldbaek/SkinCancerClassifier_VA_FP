@@ -8,32 +8,58 @@ warnings.filterwarnings("ignore")
 
 
 
+################## TEST DATA SET #####################
 
 # Generate data paths with labels
-data_directory = os.path.join(os.getcwd(), "skin_data")
-filepaths = []
+data_directory = os.path.join(os.getcwd(), "skin_data", "Testing")
+file_paths = []
 labels = []
+
 
 diagnosis_folders = os.listdir(data_directory)
 
 for diagnosis in diagnosis_folders: 
-    foldpath = os.path.join(data_directory, diagnosis) #folderpath to cancer /non_cancer folders
-    sub_folders = os.listdir(foldpath) #testing / training folders within above two folders
-    
-    for sub_folder in sub_folders:
-        sub_folder_path = os.path.join(foldpath, sub_folder)
-        image_list = os.listdir(sub_folder_path)
-    
-        for image in image_list:
-            image_path = os.path.join(sub_folder_path, image)
-            filepaths.append(image_path)
-            labels.append(diagnosis) #cancer / non_cancer
+    diagnosis_folder_path = os.path.join(data_directory, diagnosis) #folderpath to cancer /non_cancer folders
+    images = os.listdir(diagnosis_folder_path)
+
+    #make filepath for every image
+    for image in images:
+        image_path = os.path.join(diagnosis_folder_path, image)
+        file_paths.append(image_path)
+        labels.append(diagnosis)
+
 
 #Concatenate data paths with labels into one dataframe
-Fseries = pd.Series(filepaths, name= 'filepaths')
+Fseries = pd.Series(file_paths, name= 'filepaths')
 Lseries = pd.Series(labels, name='labels')
-df = pd.concat([Fseries, Lseries], axis= 1)
-print(df["filepaths"])
+test_df = pd.concat([Fseries, Lseries], axis= 1)
 
 
 
+
+################## TRAINING DATA SET #####################
+# Generate data paths with labels
+data_directory = os.path.join(os.getcwd(), "skin_data", "Training")
+file_paths = []
+labels = []
+
+
+diagnosis_folders = os.listdir(data_directory)
+
+for diagnosis in diagnosis_folders: 
+    diagnosis_folder_path = os.path.join(data_directory, diagnosis) #folderpath to cancer /non_cancer folders
+    images = os.listdir(diagnosis_folder_path)
+
+    #make filepath for every image
+    for image in images:
+        image_path = os.path.join(diagnosis_folder_path, image)
+        file_paths.append(image_path)
+        labels.append(diagnosis)
+
+
+#Concatenate data paths with labels into one dataframe
+Fseries = pd.Series(file_paths, name= 'filepaths')
+Lseries = pd.Series(labels, name='labels')
+train_df = pd.concat([Fseries, Lseries], axis= 1)
+print(test_df)
+print(train_df)

@@ -56,7 +56,14 @@ from sklearn.metrics import classification_report
 #import helper_func as hf
 
 #load in data
-df = dt.df
+train_df = dt.train_df
+test_df = dt.test_df
+
+data_directory = os.path.join(os.getcwd(), "skin_data")
+batch_size = 32
+img_height = 180
+img_width = 180
+target_size = (180,180)
 
 # Data generator
 
@@ -69,38 +76,17 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             rescale=1./255.) # rescaling factor 
 
 
-# Train generator
-train_generator=datagen.flow_from_dataframe(
-    dataframe=train_df,
-    directory= os.path.join("..","..", ".."), #my path
-    x_col="image_path",
-    y_col="class_label",
-    batch_size=batch_size,
-    seed=666,
-    shuffle=True,
-    class_mode= class_mode,
-    target_size=target_size)
 
-# Validation generator
-val_generator=datagen.flow_from_dataframe(
-    dataframe=val_df,
-    directory= os.path.join("..","..", ".."), #my path
-    x_col="image_path",
-    y_col="class_label",
-    batch_size=batch_size,
-    seed=666,
-    shuffle=True,
-    class_mode= class_mode,
-    target_size=target_size)
+train_ds = datagen.flow_from_dataframe(
+            dataframe= train_df,
+            #directory= df["filepath"] #none because the filepath is complete
+            x_col="filepaths",
+            y_col="labels",
+            batch_size=batch_size,
+            seed=666,
+            shuffle=True,
+            class_mode= "binary",
+            validation_split=0.2,
+            target_size=target_size)
 
-    # Validation generator
-test_generator=datagen.flow_from_dataframe(
-    dataframe=test_df,
-    directory= os.path.join("..","..", ".."), #my path
-    x_col="image_path",
-    y_col="class_label",
-    batch_size=batch_size,
-    seed=666,
-    shuffle=False,
-    class_mode= class_mode,
-    target_size=target_size)
+
