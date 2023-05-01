@@ -55,6 +55,17 @@ from sklearn.metrics import classification_report
 sys.path.append(os.path.join("utils"))
 import helper_func as hf
 
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+import os
+import pandas as pd
+from PIL import Image
+from sklearn.model_selection import train_test_split
+from tensorflow.keras import losses
+import time
+
+
 #load in data
 train_df = dt.train_df
 test_df = dt.test_df
@@ -146,92 +157,45 @@ for image_batch, labels_batch in train_ds:
 
 
 
-############## LOAD MODEL ################
-# load the pretrained VGG16 model without classifier layers
-model = VGG16(include_top=False, 
-            pooling="avg", #CHANGE ("max" ?)
-            input_shape= (180, 180, 3))
+############## MODEL ################
+input_shape = (180,180,3)
 
-# mark loaded layers as not trainable
-for layer in model.layers:
-    layer.trainable = False #resetting 
-# we only wanna update the classification layer in the end,
-# so now we "freeze" all weigths in the feature extraction part and make them "untrainable"
-
-# Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
-early_stopping = EarlyStopping(monitor = 'val_loss', # watch the val loss metric
-                            patience = 5,
-                            restore_best_weights = True) # if val loss decreases for 3 epochs in a row, stop training
-
-
-
-########## adding classification layers #########
-
-# add new classifier layers
-flat1 = Flatten()(model.layers[-1].output)
-bn = BatchNormalization()(flat1) #normalize the feature weights 
-# 1st layer
-class1 = Dense(256, 
-            activation="relu")(bn)
-# 2nd layer               
-class2 = Dense(128, 
-            activation="relu")(class1)
-# output layer    
-output = Dense(1, # only 1 output (either 0 or 1)
-            activation="sigmoid")(class2) # sigmoid 
-
-# define new model
-model = Model(inputs=model.inputs, 
-            outputs=output)
-
-# compile
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate= 0.01,
-    decay_steps=10000,
-    decay_rate=0.9)
-sgd = SGD(learning_rate=lr_schedule)
-
-model.compile(optimizer=sgd,
-            loss='categorical_crossentropy',
-            metrics=['accuracy'])
-
-
+model = tf.keras.models.Sequential([
+    # since Conv2D is the first layer of the neural network, we should also specify the size of the input
+    tf.keras.layers.Conv2D(16, (3,3), activation='relu', input_shape=input_shape),
+    # apply pooling
+    tf.keras.layers.MaxPooling2D(2,2),
+    # and repeat the process
+    tf.keras.layers.Conv2D(32, (3,3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2,2), 
+    tf.keras.layers.Conv2D(64, (3,3), activation='relu'), 
+    tf.keras.layers.MaxPooling2D(2,2),
+    # flatten the result to feed it to the dense layer
+    tf.keras.layers.Flatten(), 
+    # and define 512 neurons for processing the output coming by the previous layers
+    tf.keras.layers.Dense(512, activation='relu'), 
+    # a single output neuron. The result will be 0 if the image is a cat, 1 if it is a dog
+    tf.keras.layers.Dense(1, activation='sigmoid')  
+])
+model.summary()
 
 
 ############## FIT & TRAIN #################
+model.compile(optimizer = tf.optimizers.Adam(),
+              loss = 'binary_crossentropy',
+              metrics=['accuracy'])
 
-#model
-skin_cancer_classifier = model.fit(train_ds,
-                    steps_per_epoch= train_ds.samples // batch_size,
-                    epochs = n_epochs,
-                    validation_data=train_ds,
-                    validation_steps= val_ds.samples // batch_size,
-                    batch_size = batch_size,
-                    verbose = 1,
-                    callbacks=[early_stopping])
+epochs = 20
+history = model.fit(train_ds,
+                    validation_data=val_ds,
+                    epochs=epochs)
 
 
+loss, accuracy = model.evaluate(test_ds)
 
-# PLOT 
-#hf.plot_history(skin_cancer_classifier, n_epochs)
-
-################### MODEL PREDICT ########################
-predictions = model.predict(test_ds, # X_test
-                            batch_size=batch_size)
+print("Loss: ", loss)
+print("Accuracy: ", accuracy)
 
 
-# Make classification report
-report=(classification_report(test_ds.classes, # y_test 
-                                            predictions.argmax(axis=1),
-                                            target_names=test_ds.class_indices.keys())) #labels
 
-# Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "classification_report.txt")
-
-# Save the  classification report
-file = open(outpath_report, "w")
-file.write(report)
-file.close()
-
-print( "Saving the indo fashion classification report in the folder ´out´")
 
