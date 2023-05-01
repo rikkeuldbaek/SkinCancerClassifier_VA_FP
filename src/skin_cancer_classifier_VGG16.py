@@ -81,7 +81,7 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             brightness_range=(0.2, 0.8),
                             rotation_range=20, #Degree range for random rotations.
                             rescale=1./255.,# rescaling factor 
-                            validation_split=0.2) # validation split
+                            validation_split=0.4) # validation split
 
 
 # training data
@@ -155,6 +155,7 @@ model = VGG16(include_top=False,
             pooling="max", 
             input_shape= (180, 180, 3))
 
+
 # mark loaded layers as not trainable
 for layer in model.layers:
     layer.trainable = False #resetting 
@@ -194,7 +195,7 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
 sgd = SGD(learning_rate=lr_schedule)
 
 model.compile(optimizer=sgd,
-            loss='categorical_crossentropy',
+            loss='binary_crossentropy',
             metrics=['accuracy'])
 
 
@@ -209,12 +210,19 @@ skin_cancer_classifier = model.fit(train_ds,
                     validation_data=train_ds,
                     validation_steps= val_ds.samples // batch_size,
                     batch_size = batch_size,
-                    verbose = 1)
+                    verbose = 1)#,
+                    #callbacks=[EarlyStopping(monitor='val_loss', patience=1, restore_best_weights = True)]
+                    #)
 
 
 
-# PLOT 
-#hf.plot_history(skin_cancer_classifier, n_epochs)
+############ EVALUATION #####################
+hf.plot_history(skin_cancer_classifier, n_epochs)
+
+loss, accuracy = model.evaluate(test_ds)
+
+print("Loss: ", loss)
+print("Accuracy: ", accuracy)
 
 ################### MODEL PREDICT ########################
 predictions = model.predict(test_ds, # X_test
@@ -226,8 +234,9 @@ report=(classification_report(test_ds.classes, # y_test
                                             predictions.argmax(axis=1),
                                             target_names=test_ds.class_indices.keys())) #labels
 
+print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "report.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "VGG16_report.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")

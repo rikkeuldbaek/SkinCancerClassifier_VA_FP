@@ -62,6 +62,6 @@ Lseries = pd.Series(train_labels, name='labels')
 train_df = pd.concat([Fseries, Lseries], axis= 1)
 
 
-#print(train_df)
-#print(test_df)
-
+# Count of labels within each dataset
+print(pd.Series(test_df["labels"]).value_counts())   # 42 Cancer and 42 Non_Cancer
+print(pd.Series(train_df["labels"]).value_counts()) # 42 Cancer and 162 Non_Cancer

@@ -85,7 +85,7 @@ test_df = dt.test_df
 #################### Prepping variables ####################
 
 #data_directory = os.path.join(os.getcwd(), "skin_data")
-batch_size = 64
+batch_size = 32
 img_height = 180
 img_width = 180
 target_size = (180,180)
@@ -151,7 +151,7 @@ test_ds =test_datagen.flow_from_dataframe(
 
 # output from generators
 print(train_ds.class_indices.keys())#unique labels ['Cancer', 'Non_cancer']
-print(train_ds.class_indices)#unique labels ['Cancer':0, 'Non_cancer':1 ]
+print(train_ds.class_indices)#unique labels and numeric representation ['Cancer':0, 'Non_cancer':1 ]
 
 
 ############## PLOT SAMPLE ################
@@ -171,6 +171,12 @@ for image_batch, labels_batch in train_ds:
 
 
 ############## Shallow net MODEL  ###############
+#the layers are just added one at a time :) 
+# Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
+#early_stopping = EarlyStopping(monitor = "val_loss", # watch the val loss metric
+#                            patience = 5,
+#                            restore_best_weights = True)
+
 #initalise model
 model = Sequential()
 
@@ -188,25 +194,51 @@ model.add(Activation("relu"))
 model.add(Dense(1)) #output layer with 1 node
 model.add(Activation("sigmoid"))
 
-#the layers are just added one at a time :) 
 
+
+
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate= 0.01,
+    decay_steps=10000,
+    decay_rate=0.9)
+sgd = SGD(learning_rate=lr_schedule)
+
+model.compile(optimizer=sgd,
+            loss='binary_crossentropy',
+            metrics=['accuracy'])
 
 
 #print(model.summary())
 
 ############## FIT & TRAIN #################
-model.compile(optimizer = tf.optimizers.Adam(),
-              loss = 'binary_crossentropy',
-              metrics=['accuracy'])
 
 epochs = 20
 history = model.fit(train_ds,
                     validation_data=val_ds,
-                    epochs=epochs)
+                    epochs=epochs#,
+                    #callbacks=[early_stopping]
+                    )
+
+############ plot model #######
+hf.plot_history(history, n_epochs)
 
 
 loss, accuracy = model.evaluate(test_ds)
 
 print("Loss: ", loss)
 print("Accuracy: ", accuracy)
+
+
+################### MODEL PREDICT ########################
+predictions = model.predict(test_ds, # X_test
+                            batch_size=batch_size)
+
+
+# Make classification report
+report=(classification_report(test_ds.classes, # y_test 
+                                            predictions.argmax(axis=1),
+                                            target_names=test_ds.class_indices.keys())) #labels
+
+print(report)
+
 

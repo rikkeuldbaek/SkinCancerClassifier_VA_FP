@@ -190,6 +190,9 @@ history = model.fit(train_ds,
                     validation_data=val_ds,
                     epochs=epochs)
 
+############ plot model #######
+hf.plot_history(history, n_epochs)
+
 
 loss, accuracy = model.evaluate(test_ds)
 
