@@ -64,9 +64,9 @@ test_df = dt.test_df
 
 #data_directory = os.path.join(os.getcwd(), "skin_data")
 batch_size = 5
-img_height = 244
-img_width = 244
-target_size = (244,244)
+img_height = 180
+img_width = 180
+target_size = (180,180)
 n_epochs = 20
 
 #################### Data generator ####################
@@ -153,7 +153,7 @@ for image_batch, labels_batch in train_ds:
 # load the pretrained VGG16 model without classifier layers
 model = VGG16(include_top=False, 
             pooling="max", 
-            input_shape= (244, 244, 3))
+            input_shape= (180, 180, 3))
 
 # mark loaded layers as not trainable
 for layer in model.layers:
