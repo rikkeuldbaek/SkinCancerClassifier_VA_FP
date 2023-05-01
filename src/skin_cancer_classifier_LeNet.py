@@ -50,6 +50,28 @@ from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import classification_report
 
+# data tools 
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+# sklearn tools
+from sklearn.preprocessing import LabelBinarizer
+from sklearn.metrics import classification_report
+
+# tf tools
+from tensorflow.keras.datasets import cifar10
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import (Conv2D, 
+                                     MaxPooling2D, 
+                                     Activation, 
+                                     Flatten, 
+                                     Dense)
+from tensorflow.keras.utils import plot_model
+from tensorflow.keras.optimizers import SGD
+from tensorflow.keras import backend as K
+
+
 
 # Import predefined helper functions (for plotting)
 sys.path.append(os.path.join("utils"))
@@ -148,91 +170,59 @@ for image_batch, labels_batch in train_ds:
     break
 
 
+############## Shallow net MODEL  ###############
+# define model
+model = Sequential()
 
-############## LOAD MODEL ################
-# load the pretrained VGG16 model without classifier layers
-model = VGG16(include_top=False, 
-            pooling="max", 
-            input_shape= (180, 180, 3))
+# first set of layers CONV => RELU => MAXPOOL
+model.add(Conv2D(32, # input nodes
+                 (3,3), # kernel size
+                 padding="same",
+                 input_shape=(180,180,3)))
+model.add(Activation("relu"))
+model.add(MaxPooling2D(pool_size = (2,2),
+                       strides = (2,2)))# how far we step up and down (thus 2 values), 2 up and 2 down
 
-# mark loaded layers as not trainable
-for layer in model.layers:
-    layer.trainable = False #resetting 
-# we only wanna update the classification layer in the end,
-# so now we "freeze" all weigths in the feature extraction part and make them "untrainable"
+# second set of layers CONV => RELU => MAXPOOL
+model.add(Conv2D(50, (5,5), 
+                 padding="same"))
+model.add(Activation("relu"))
+model.add(MaxPooling2D(pool_size = (2,2),
+                       strides = (2,2)))
+
+# FC => RELU
+model.add(Flatten())
+model.add(Dense(128))
+model.add(Activation("relu"))
+
+# softmax classifier
+model.add(Dense(1))
+model.add(Activation("sigmoid"))
 
 
+#print(model.summary())
 
-########## adding classification layers #########
-
-# add new classifier layers
-flat1 = Flatten()(model.layers[-1].output)
-bn = BatchNormalization()(flat1) #normalize the feature weights 
-# 1st layer
-class1 = Dense(256, 
-            activation="relu")(bn)
-# 2nd layer               
-class2 = Dense(128, 
-            activation="relu")(class1)
-
-# 2nd layer               
-class3 = Dense(70, 
-            activation="relu")(class2)
-# output layer    
-output = Dense(1, # only 1 output (either 0 or 1)
-            activation="sigmoid")(class3) # sigmoid 
-
-# define new model
-model = Model(inputs=model.inputs, 
-            outputs=output)
-
-# compile
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate= 0.01,
-    decay_steps=10000,
-    decay_rate=0.9)
-sgd = SGD(learning_rate=lr_schedule)
-
-model.compile(optimizer=sgd,
-            loss='categorical_crossentropy',
-            metrics=['accuracy'])
 
 
 
 
 ############## FIT & TRAIN #################
+model.compile(optimizer = tf.optimizers.Adam(),
+              loss = 'binary_crossentropy',
+              metrics=['accuracy'])
 
-#model
-skin_cancer_classifier = model.fit(train_ds,
-                    steps_per_epoch= train_ds.samples // batch_size,
-                    epochs = n_epochs,
-                    validation_data=train_ds,
-                    validation_steps= val_ds.samples // batch_size,
-                    batch_size = batch_size,
-                    verbose = 1)
-
+epochs = 20
+history = model.fit(train_ds,
+                    validation_data=val_ds,
+                    epochs=epochs)
 
 
-# PLOT 
-#hf.plot_history(skin_cancer_classifier, n_epochs)
+############ plot model #######
+hf.plot_history(history, n_epochs)
 
-################### MODEL PREDICT ########################
-predictions = model.predict(test_ds, # X_test
-                            batch_size=batch_size)
+####### evaluate
+loss, accuracy = model.evaluate(test_ds)
 
-
-# Make classification report
-report=(classification_report(test_ds.classes, # y_test 
-                                            predictions.argmax(axis=1),
-                                            target_names=test_ds.class_indices.keys())) #labels
-
-# Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "report.txt")
-
-# Save the  classification report
-file = open(outpath_report, "w")
-file.write(report)
-file.close()
-
-print( "Saving the indo fashion classification report in the folder ´out´")
+print("Loss: ", loss)
+print("Accuracy: ", accuracy)
 
