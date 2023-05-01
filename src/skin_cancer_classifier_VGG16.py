@@ -62,7 +62,7 @@ test_df = dt.test_df
 
 #################### Prepping variables ####################
 
-batch_size = 64
+batch_size = 32
 img_height = 180
 img_width = 180
 target_size = (180,180)
