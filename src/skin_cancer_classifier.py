@@ -63,10 +63,10 @@ test_df = dt.test_df
 #################### Prepping variables ####################
 
 #data_directory = os.path.join(os.getcwd(), "skin_data")
-batch_size = 32
-img_height = 180
-img_width = 180
-target_size = (180,180)
+batch_size = 5
+img_height = 244
+img_width = 244
+target_size = (244,244)
 n_epochs = 20
 
 #################### Data generator ####################
@@ -74,8 +74,11 @@ n_epochs = 20
 # Specify Image Data Generator 
 
 datagen=ImageDataGenerator(horizontal_flip= True,
+                            vertical_flip=True,
+                            zca_whitening = True,
                             shear_range= 0.2, # Shear angle in counter-clockwise direction in degrees
                             zoom_range=0.2, #Range for random zoom
+                            brightness_range=(0.2, 0.8),
                             rotation_range=20, #Degree range for random rotations.
                             rescale=1./255.,# rescaling factor 
                             validation_split=0.2) # validation split
@@ -149,8 +152,8 @@ for image_batch, labels_batch in train_ds:
 ############## LOAD MODEL ################
 # load the pretrained VGG16 model without classifier layers
 model = VGG16(include_top=False, 
-            pooling="avg", #CHANGE ("max" ?)
-            input_shape= (180, 180, 3))
+            pooling="max", 
+            input_shape= (244, 244, 3))
 
 # mark loaded layers as not trainable
 for layer in model.layers:
@@ -176,9 +179,13 @@ class1 = Dense(256,
 # 2nd layer               
 class2 = Dense(128, 
             activation="relu")(class1)
+
+# 2nd layer               
+class3 = Dense(70, 
+            activation="relu")(class2)
 # output layer    
 output = Dense(1, # only 1 output (either 0 or 1)
-            activation="sigmoid")(class2) # sigmoid 
+            activation="sigmoid")(class3) # sigmoid 
 
 # define new model
 model = Model(inputs=model.inputs, 
