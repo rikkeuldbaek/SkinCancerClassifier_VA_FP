@@ -7,13 +7,12 @@ import warnings
 warnings.filterwarnings("ignore")
 
 
-
 ################## TEST DATA SET #####################
 
 # Generate data paths with labels
 data_directory = os.path.join(os.getcwd(),  "skin_data", "Testing")
-file_paths = []
-labels = []
+test_file_paths = []
+test_labels = []
 
 
 diagnosis_folders = os.listdir(data_directory)
@@ -25,13 +24,13 @@ for diagnosis in diagnosis_folders:
     #make filepath for every image
     for image in images:
         image_path = os.path.join(diagnosis_folder_path, image)
-        file_paths.append(image_path)
-        labels.append(diagnosis) 
+        test_file_paths.append(image_path)
+        test_labels.append(diagnosis) 
 
 
 # Merge data paths with labels into a test dataframe
-Fseries = pd.Series(file_paths, name= 'filepaths')
-Lseries = pd.Series(labels, name='labels')
+Fseries = pd.Series(test_file_paths, name= 'filepaths')
+Lseries = pd.Series(test_labels, name='labels')
 test_df = pd.concat([Fseries, Lseries], axis= 1)
 
 
@@ -40,8 +39,8 @@ test_df = pd.concat([Fseries, Lseries], axis= 1)
 ################## TRAINING DATA SET #####################
 # Generate data paths with labels
 data_directory = os.path.join(os.getcwd(), "skin_data", "Training")
-file_paths = []
-labels = []
+train_file_paths = []
+train_labels = []
 
 
 diagnosis_folders = os.listdir(data_directory)
@@ -53,13 +52,16 @@ for diagnosis in diagnosis_folders:
     #make filepath for every image
     for image in images:
         image_path = os.path.join(diagnosis_folder_path, image)
-        file_paths.append(image_path)
-        labels.append(diagnosis)
+        train_file_paths.append(image_path)
+        train_labels.append(diagnosis)
 
 
 # Merge data paths with labels into a training dataframe
-Fseries = pd.Series(file_paths, name= 'filepaths')
-Lseries = pd.Series(labels, name='labels')
+Fseries = pd.Series(train_file_paths, name= 'filepaths')
+Lseries = pd.Series(train_labels, name='labels')
 train_df = pd.concat([Fseries, Lseries], axis= 1)
-print(test_df)
-print(train_df)
+
+
+#print(train_df)
+#print(test_df)
+

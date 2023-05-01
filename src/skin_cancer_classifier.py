@@ -52,20 +52,24 @@ from sklearn.metrics import classification_report
 
 
 # Import predefined helper functions (for plotting)
-#sys.path.append(os.path.join("utils"))
-#import helper_func as hf
+sys.path.append(os.path.join("utils"))
+import helper_func as hf
 
 #load in data
 train_df = dt.train_df
 test_df = dt.test_df
 
-data_directory = os.path.join(os.getcwd(), "skin_data")
+
+#################### Prepping variables ####################
+
+#data_directory = os.path.join(os.getcwd(), "skin_data")
 batch_size = 32
 img_height = 180
 img_width = 180
 target_size = (180,180)
+n_epochs = 5
 
-# Data generator
+#################### Data generator ####################
 
 # Specify Image Data Generator 
 
@@ -73,20 +77,161 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             shear_range= 0.2, # Shear angle in counter-clockwise direction in degrees
                             zoom_range=0.2, #Range for random zoom
                             rotation_range=20, #Degree range for random rotations.
-                            rescale=1./255.) # rescaling factor 
+                            rescale=1./255.,# rescaling factor 
+                            validation_split=0.2) # validation split
 
 
-
+# training data
 train_ds = datagen.flow_from_dataframe(
-            dataframe= train_df,
-            #directory= df["filepath"] #none because the filepath is complete
-            x_col="filepaths",
-            y_col="labels",
-            batch_size=batch_size,
-            seed=666,
-            shuffle=True,
-            class_mode= "binary",
-            validation_split=0.2,
-            target_size=target_size)
+                    dataframe= train_df,
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
+                    batch_size=batch_size,
+                    seed=666,
+                    shuffle=True,
+                    class_mode= "binary",
+                    subset="training",
+                    target_size=target_size)
 
+
+# validation data
+val_ds =datagen.flow_from_dataframe(
+                    dataframe=train_df,
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
+                    batch_size=batch_size,
+                    seed=666,
+                    subset="validation",
+                    shuffle=True,
+                    class_mode= "binary",
+                    target_size=target_size)
+
+
+test_datagen=ImageDataGenerator(rescale=1./255.)
+
+# test data
+test_ds =test_datagen.flow_from_dataframe(
+                    dataframe=test_df,
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
+                    batch_size=batch_size,
+                    seed=666,
+                    shuffle=False,
+                    class_mode= "binary",
+                    target_size=target_size)
+
+
+# output from generators
+print(train_ds.class_indices.keys())#unique labels ['Cancer', 'Non_cancer']
+print(train_ds.class_indices)#unique labels ['Cancer':0, 'Non_cancer':1 ]
+
+
+############## PLOT SAMPLE ################
+
+
+
+
+############## CHECK DATA ################
+#check shapes of generated train_ds
+for image_batch, labels_batch in train_ds:
+    print(image_batch.shape)
+    print(labels_batch.shape)
+    #check the images are standardized 
+    first_image = image_batch[0]
+    print(np.min(first_image), np.max(first_image)) # pixel values should be between 0 and 1
+    break
+
+
+
+############## LOAD MODEL ################
+# load the pretrained VGG16 model without classifier layers
+model = VGG16(include_top=False, 
+            pooling="avg", #CHANGE ("max" ?)
+            input_shape= (180, 180, 3))
+
+# mark loaded layers as not trainable
+for layer in model.layers:
+    layer.trainable = False #resetting 
+# we only wanna update the classification layer in the end,
+# so now we "freeze" all weigths in the feature extraction part and make them "untrainable"
+
+# Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
+early_stopping = EarlyStopping(monitor = 'val_loss', # watch the val loss metric
+                            patience = 5,
+                            restore_best_weights = True) # if val loss decreases for 3 epochs in a row, stop training
+
+
+
+########## adding classification layers #########
+
+# add new classifier layers
+flat1 = Flatten()(model.layers[-1].output)
+bn = BatchNormalization()(flat1) #normalize the feature weights 
+# 1st layer
+class1 = Dense(256, 
+            activation="relu")(bn)
+# 2nd layer               
+class2 = Dense(128, 
+            activation="relu")(class1)
+# output layer    
+output = Dense(2, # n labels
+            activation="softmax")(class2) #add a final layer !!!!!!!!!! sigmoid or softmax
+
+# define new model
+model = Model(inputs=model.inputs, 
+            outputs=output)
+
+# compile
+lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+    initial_learning_rate= 0.01,
+    decay_steps=10000,
+    decay_rate=0.9)
+sgd = SGD(learning_rate=lr_schedule)
+
+model.compile(optimizer=sgd,
+            loss='categorical_crossentropy',
+            metrics=['accuracy'])
+
+
+
+
+############## FIT & TRAIN #################
+
+#model
+skin_cancer_classifier = model.fit(train_ds,
+                    steps_per_epoch= train_ds.samples // batch_size,
+                    epochs = n_epochs,
+                    validation_data=train_ds,
+                    validation_steps= val_ds.samples // batch_size,
+                    batch_size = batch_size,
+                    verbose = 1,
+                    callbacks=[early_stopping])
+
+
+
+# PLOT 
+hf.plot_history(skin_cancer_classifier, n_epochs)
+
+################### MODEL PREDICT ########################
+predictions = model.predict(test_ds, # X_test
+                            batch_size=batch_size)
+
+
+# Make classification report
+report=(classification_report(test_ds.classes, # y_test 
+                                            predictions.argmax(axis=1),
+                                            target_names=test_ds.class_indices.keys())) #labels
+
+# Define outpath for classification report
+outpath_report = os.path.join(os.getcwd(), "out", "classification_report.txt")
+
+# Save the  classification report
+file = open(outpath_report, "w")
+file.write(report)
+file.close()
+
+print( "Saving the indo fashion classification report in the folder ´out´")
 
