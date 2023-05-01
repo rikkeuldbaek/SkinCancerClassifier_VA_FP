@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 ################## TEST DATA SET #####################
 
 # Generate data paths with labels
-data_directory = os.path.join(os.getcwd(), "skin_data", "Testing")
+data_directory = os.path.join(os.getcwd(),  "skin_data", "Testing")
 file_paths = []
 labels = []
 
@@ -26,10 +26,10 @@ for diagnosis in diagnosis_folders:
     for image in images:
         image_path = os.path.join(diagnosis_folder_path, image)
         file_paths.append(image_path)
-        labels.append(diagnosis)
+        labels.append(diagnosis) 
 
 
-#Concatenate data paths with labels into one dataframe
+# Merge data paths with labels into a test dataframe
 Fseries = pd.Series(file_paths, name= 'filepaths')
 Lseries = pd.Series(labels, name='labels')
 test_df = pd.concat([Fseries, Lseries], axis= 1)
@@ -57,7 +57,7 @@ for diagnosis in diagnosis_folders:
         labels.append(diagnosis)
 
 
-#Concatenate data paths with labels into one dataframe
+# Merge data paths with labels into a training dataframe
 Fseries = pd.Series(file_paths, name= 'filepaths')
 Lseries = pd.Series(labels, name='labels')
 train_df = pd.concat([Fseries, Lseries], axis= 1)

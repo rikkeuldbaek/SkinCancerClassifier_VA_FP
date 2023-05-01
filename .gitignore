@@ -161,6 +161,8 @@ cython_debug/
 
 # data (large files)
 *skin_data
+*Testing
+*Training
 *Cancer
 *Non_Cancer
 

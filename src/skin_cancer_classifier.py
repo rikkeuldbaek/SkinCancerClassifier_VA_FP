@@ -67,7 +67,7 @@ target_size = (180,180)
 
 # Data generator
 
-# Specify Image Data Generator
+# Specify Image Data Generator 
 
 datagen=ImageDataGenerator(horizontal_flip= True,
                             shear_range= 0.2, # Shear angle in counter-clockwise direction in degrees
