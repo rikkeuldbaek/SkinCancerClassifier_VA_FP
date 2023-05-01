@@ -62,12 +62,11 @@ test_df = dt.test_df
 
 #################### Prepping variables ####################
 
-#data_directory = os.path.join(os.getcwd(), "skin_data")
 batch_size = 64
 img_height = 180
 img_width = 180
 target_size = (180,180)
-n_epochs = 20
+n_epochs = 30
 
 #################### Data generator ####################
 
@@ -176,12 +175,15 @@ class1 = Dense(256,
 class2 = Dense(128, 
             activation="relu")(class1)
 
-# 2nd layer               
-class3 = Dense(70, 
+# 3rd layer               
+class3 = Dense(90, 
             activation="relu")(class2)
+# 4th layer               
+class4 = Dense(30, 
+            activation="relu")(class3)
 # output layer    
 output = Dense(1, # only 1 output (either 0 or 1)
-            activation="sigmoid")(class3) # sigmoid 
+            activation="sigmoid")(class4) # sigmoid 
 
 # define new model
 model = Model(inputs=model.inputs, 
