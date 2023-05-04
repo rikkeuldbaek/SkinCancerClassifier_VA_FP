@@ -172,3 +172,7 @@ cython_debug/
 #virtual environment
 VA_fp_env
 *VA_fp_env 
+
+#data
+*images 
+images
