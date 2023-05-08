@@ -67,7 +67,7 @@ batch_size = 32
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 2
+n_epochs = 10
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
@@ -128,13 +128,8 @@ test_ds =test_datagen.flow_from_dataframe(
                     target_size=target_size)
 
 
-# output from generators
-print(train_ds.class_indices.keys())#unique labels ['AKIEC', 'BCC', 'BKL', 'DF', 'MEL', 'NV', 'VASC']
-print(train_ds.class_indices)#unique labels and numerical value {'AKIEC': 0, 'BCC': 1, 'BKL': 2, 'DF': 3, 'MEL': 4, 'NV': 5, 'VASC': 6}
-
 
 ############## PLOT SAMPLE ################
-
 
 
 
@@ -240,7 +235,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "VGG16_skin_cancer_report.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "skin_cancer_report.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")

@@ -14,24 +14,22 @@ import os
 
 ##################### UNZIPPING #######################
 
-#define path for zipfile of images
+# define path for zipfile of images
 skin_cancer_path="/work/VA_final_project/skin_cancer/archive.zip"
      
 
-####### reading in files
+# reading in files
 with zipfile.ZipFile(skin_cancer_path, mode="r") as archive:
     badfiles=archive.testzip()
     print(badfiles) #print if any files are corrupted
     archive.extractall("data/")
 
 
-#images/ISIC_0026299.jpg' 
-
 ##################### COUNTING DATA #######################
-# check all data is loaded in
 # define path of images
 path = os.path.join(os.getcwd(),"data","archive","images") 
 
+# check all data is loaded in
 count = 0
 
 # Iterate directory
