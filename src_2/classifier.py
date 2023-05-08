@@ -67,7 +67,7 @@ batch_size = 32
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 15
+n_epochs = 30
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
