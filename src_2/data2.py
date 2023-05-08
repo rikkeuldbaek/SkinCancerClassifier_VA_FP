@@ -1,7 +1,7 @@
 ### Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
-# Date: 27th of April 2023
+# Date: 8th of May 2023
 
 #--------------------------------------------------------#
 ################ SKIN CANCER CLASSIFIER ##################

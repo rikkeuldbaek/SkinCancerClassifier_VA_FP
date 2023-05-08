@@ -67,7 +67,7 @@ batch_size = 32
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 10
+n_epochs = 15
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
@@ -76,7 +76,7 @@ directory= os.path.join(os.getcwd(),"data","archive","images")
 
 datagen=ImageDataGenerator(horizontal_flip= True,
                             vertical_flip=True,
-                            #zca_whitening = True,
+                            zca_whitening = True,
                             shear_range= 0.2, # Shear angle in counter-clockwise direction in degrees
                             zoom_range=0.2, #Range for random zoom
                             brightness_range=(0.2, 0.8),
@@ -148,7 +148,7 @@ for image_batch, labels_batch in train_ds:
 ############## LOAD MODEL ################
 # load the pretrained VGG16 model without classifier layers
 model = VGG16(include_top=False, 
-            pooling="max", 
+            pooling="avg", 
             input_shape= (224, 224, 3))
 
 
@@ -173,14 +173,14 @@ class2 = Dense(128,
             activation="relu")(class1)
 
 # 3rd layer               
-#class3 = Dense(90, 
-#            activation="relu")(class2)
+class3 = Dense(90, 
+            activation="relu")(class2)
 # 4th layer               
-#class4 = Dense(30, 
-#            activation="relu")(class3)
+class4 = Dense(30, 
+            activation="relu")(class3)
 # output layer    
-output = Dense(7, #  7 lables
-            activation="softmax")(class2) 
+output = Dense(7, #7 lables
+            activation="softmax")(class4) 
 
 # define new model
 model = Model(inputs=model.inputs, 
@@ -235,7 +235,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "skin_cancer_report.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "skin_cancer_report1.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")
