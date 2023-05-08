@@ -8,3 +8,5 @@ keras_preprocessing
 scikit_learn
 tqdm
 seaborn
+scikit-multilearn
+
