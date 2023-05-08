@@ -218,11 +218,6 @@ skin_cancer_classifier = model.fit(train_ds,
 ############ EVALUATION #####################
 hf.plot_history(skin_cancer_classifier, n_epochs)
 
-loss, accuracy = model.evaluate(test_ds)
-
-print("Loss: ", loss)
-print("Accuracy: ", accuracy)
-
 ################### MODEL PREDICT ########################
 predictions = model.predict(test_ds, # X_test
                             batch_size=batch_size)
