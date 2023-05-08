@@ -2,7 +2,7 @@
 update coming up :)
 
 
-# Count of labels within each dataset
-Test: 42 Cancer and 42 Non_Cancer
-Train : 42 Cancer and 162 Non_Cancer
+# DATA
+The labels were highly unbalanced eg. data contained 6705 images of cancer type  NV, while containing 115 images of cancer type DF. Thus the data was balanced out, however this decreased the sample size drastically.
+
 

@@ -1,29 +1,17 @@
+### Skin Cancer Classifier
+## Cultural Data Science - Visual Analytics 
+# Author: Rikke Uldbæk (202007501)
+# Date: 27th of April 2023
 
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import backend as K
-from tensorflow.keras.layers import Dense, Activation,Dropout,Conv2D, MaxPooling2D,BatchNormalization, Flatten
-from tensorflow.keras.optimizers import Adam, Adamax
-from tensorflow.keras.metrics import categorical_crossentropy
-from tensorflow.keras import regularizers
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.models import Model, load_model, Sequential
+#--------------------------------------------------------#
+################ SKIN CANCER CLASSIFIER ##################
+#--------------------------------------------------------#
+
+#loading packages
 import numpy as np
 import pandas as pd
-import shutil
-import time
-#import cv2 as cv2
-from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-from matplotlib.pyplot import imshow
 import os
-import seaborn as sns
-sns.set_style('darkgrid')
-from PIL import Image
-from sklearn.metrics import confusion_matrix, classification_report
-
-
 
 ################# DF PREPROCESSING THE GROUNDTRUTH.CSV #################
 
@@ -35,7 +23,6 @@ labels=['MEL', 'NV', 'BCC', 'AKIEC', 'BKL', 'DF', 'VASC']
 
 # Insert missing .jpg after image filename
 df['image']=df['image'].apply(lambda x: x+ '.jpg')
-print (df.head())
 
 # Rearrange dataframe and make a label column with type of skin cancer
 label_list=[]
@@ -47,7 +34,37 @@ for i in range (len(df)):
     label_list.append(label)
 df['label']= label_list
 df=df.drop(labels, axis=1)
-print (df.head())
+
+
+#################### FIX UNBALANCED TRAIN DATA #####################
+# Current label distribution
+print( "***"*15)
+print('Number of data points: ', len(df))
+print('Unbalanced label distribution: ')
+print(df['label'].value_counts()) 
+print( "***"*15)
+# sampling to make balanced data
+size=500 #sample if a class has more than 500 data points 
+samples=[]
+group=df.groupby('label')
+for label in df['label'].unique():
+    Lgroup=group.get_group(label)
+    count=int(Lgroup['label'].value_counts())    
+    if count>=size: 
+        sample=Lgroup.sample(size, axis=0)        
+    else:        
+        sample=Lgroup.sample(frac=1, axis=0)
+    samples.append(sample) 
+df=pd.concat(samples, axis=0).reset_index(drop=True)
+
+print( "***"*15)
+print('Number of data points: ', len(df))
+print('Balanced label distribution: ')  
+print (df['label'].value_counts())  
+print( "***"*15)
+print( "  "*15)
+
+
 
 ##################### TEST AND TRAIN SPLIT #####################
 
@@ -74,27 +91,3 @@ print( "---"*15)
 print( 'valid_df length: ', len(val_df))
 print( "***"*15)
 
-
-# The data is unbalanced with regards to labels 
-print(train_df['label'].value_counts())
-print(test_df['label'].value_counts())
-print(val_df['label'].value_counts())
-
-
-##################### FIX UNBALANCED DATA #####################
-print ('original number of classes: ', len(df['label'].unique()))
-size=300 # set number of samples for each class
-samples=[]
-group=df.groupby('label')
-for label in df['label'].unique():
-    Lgroup=group.get_group(label)
-    count=int(Lgroup['label'].value_counts())    
-    if count>=size:
-        sample=Lgroup.sample(size, axis=0)        
-    else:        
-        sample=Lgroup.sample(frac=1, axis=0)
-    samples.append(sample) 
-train_df=pd.concat(samples, axis=0).reset_index(drop=True)
-print (len(train_df))
-print ('final number of classes: ', len(train_df['label'].unique()))       
-print (train_df['label'].value_counts())  
