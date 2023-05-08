@@ -230,7 +230,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "skin_cancer_report1.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "skin_cancer_report2.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")
