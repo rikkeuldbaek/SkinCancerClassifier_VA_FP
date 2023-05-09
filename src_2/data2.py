@@ -100,7 +100,7 @@ print( "***"*15)
 ########## PLOTTING THE SAMPLE ########## 
 # Isolate a sample of each diagnostic category (label)
 group=df.groupby('label')
-samples = group.sample(1, seed)
+samples = group.sample(1, random_state =6)
 
 # Convert image column to be a full path
 def convert_image_path(image_path):
@@ -110,40 +110,33 @@ def convert_image_path(image_path):
 samples['image'] = samples['image'].apply(convert_image_path)
 
 
-# Display 16 picture of the dataset with their labels
-#random_index = np.random.randint(10000, 90000, 7)
-#fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(10, 10),
-                        #subplot_kw={'xticks': [], 'yticks': []})
-
-
-#for i, ax in enumerate(axes.flat):
-#    ax.imshow(plt.imread(samples.image[random_index[i]]))
-#    ax.set_title(samples.label[random_index[i]])
-#plt.tight_layout()
-#plt.show()
-#plt.savefig('sample_pngs/diagnostic_categories.png') #save figures in folder "sample_pngs"
-
-plt.rcParams["figure.figsize"] = [7.00, 3.50]
-plt.rcParams["figure.autolayout"] = True
+# Display the 7 diagnostic categories of the dataset with their labels
+plt.rcParams["figure.figsize"] = [10, 10]
+plt.rcParams["figure.autolayout"] = False
+#### PLOTTING EACH IMAGE ####
 plt.subplot(3, 3, 1)
+plt.title("Diagnostic Categories of Skin Cancer")
 plt.imshow(plt.imread(samples['image'].iloc[0]))
+plt.title(samples['label'].iloc[0])
 plt.subplot(3, 3, 2)
 plt.imshow(plt.imread(samples['image'].iloc[1]))
+plt.title(samples['label'].iloc[1])
 plt.subplot(3, 3, 3)
 plt.imshow(plt.imread(samples['image'].iloc[2]))
+plt.title(samples['label'].iloc[2])
 plt.subplot(3, 3, 4)
 plt.imshow(plt.imread(samples['image'].iloc[3]))
+plt.title(samples['label'].iloc[3])
 plt.show()
-#######nxt row
 plt.subplot(3, 3, 5)
 plt.imshow(plt.imread(samples['image'].iloc[4]))
+plt.title(samples['label'].iloc[4])
 plt.subplot(3, 3, 6)
 plt.imshow(plt.imread(samples['image'].iloc[5]))
+plt.title(samples['label'].iloc[5])
 plt.subplot(3, 3, 7)
 plt.imshow(plt.imread(samples['image'].iloc[6]))
-
+plt.title(samples['label'].iloc[6])
 plt.show()
-
-
 plt.savefig('sample_pngs/diagnostic_categories.png') #save figures in folder "sample_pngs"
 
