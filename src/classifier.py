@@ -1,4 +1,4 @@
-### Skin Cancer Detection Model
+### Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
 # Date: 27th of April 2023
@@ -15,7 +15,7 @@ import os, sys
 import matplotlib.pyplot as plt
 
 # data 
-import data as dt
+import data2 as dt
 
 # tf tools 
 import tensorflow as tf
@@ -58,15 +58,17 @@ import helper_func as hf
 #load in data
 train_df = dt.train_df
 test_df = dt.test_df
+val_df = dt.val_df
 
 
 #################### Prepping variables ####################
 
 batch_size = 32
-img_height = 180
-img_width = 180
-target_size = (180,180)
-n_epochs = 30
+img_height = 224
+img_width = 224
+target_size = (224,224)
+n_epochs = 25
+directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
 
@@ -79,35 +81,35 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             zoom_range=0.2, #Range for random zoom
                             brightness_range=(0.2, 0.8),
                             rotation_range=20, #Degree range for random rotations.
-                            rescale=1./255.,# rescaling factor 
-                            validation_split=0.4) # validation split
+                            rescale=1./255.) #, # rescaling factor 
+                            #validation_split=0.4) # validation split
 
 
 # training data
 train_ds = datagen.flow_from_dataframe(
                     dataframe= train_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=True,
-                    class_mode= "binary",
-                    subset="training",
+                    class_mode= "categorical",
+                    #subset="training", 
                     target_size=target_size)
 
 
 # validation data
 val_ds =datagen.flow_from_dataframe(
-                    dataframe=train_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    dataframe=val_df,
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
-                    subset="validation",
+                    #subset="validation",
                     shuffle=True,
-                    class_mode= "binary",
+                    class_mode= "categorical",
                     target_size=target_size)
 
 
@@ -116,23 +118,18 @@ test_datagen=ImageDataGenerator(rescale=1./255.)
 # test data
 test_ds =test_datagen.flow_from_dataframe(
                     dataframe=test_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=False,
-                    class_mode= "binary",
+                    class_mode= "categorical",
                     target_size=target_size)
 
 
-# output from generators
-print(train_ds.class_indices.keys())#unique labels ['Cancer', 'Non_cancer']
-print(train_ds.class_indices)#unique labels ['Cancer':0, 'Non_cancer':1 ]
-
 
 ############## PLOT SAMPLE ################
-
 
 
 
@@ -151,8 +148,8 @@ for image_batch, labels_batch in train_ds:
 ############## LOAD MODEL ################
 # load the pretrained VGG16 model without classifier layers
 model = VGG16(include_top=False, 
-            pooling="max", 
-            input_shape= (180, 180, 3))
+            pooling="avg", 
+            input_shape= (224, 224, 3))
 
 
 # mark loaded layers as not trainable
@@ -182,8 +179,8 @@ class3 = Dense(90,
 class4 = Dense(30, 
             activation="relu")(class3)
 # output layer    
-output = Dense(1, # only 1 output (either 0 or 1)
-            activation="sigmoid")(class4) # sigmoid 
+output = Dense(7, #7 lables
+            activation="softmax")(class4) 
 
 # define new model
 model = Model(inputs=model.inputs, 
@@ -197,7 +194,7 @@ lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
 sgd = SGD(learning_rate=lr_schedule)
 
 model.compile(optimizer=sgd,
-            loss='binary_crossentropy',
+            loss='categorical_crossentropy',
             metrics=['accuracy'])
 
 
@@ -221,11 +218,6 @@ skin_cancer_classifier = model.fit(train_ds,
 ############ EVALUATION #####################
 hf.plot_history(skin_cancer_classifier, n_epochs)
 
-loss, accuracy = model.evaluate(test_ds)
-
-print("Loss: ", loss)
-print("Accuracy: ", accuracy)
-
 ################### MODEL PREDICT ########################
 predictions = model.predict(test_ds, # X_test
                             batch_size=batch_size)
@@ -238,12 +230,13 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "VGG16_report.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "VGG16.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")
 file.write(report)
 file.close()
 
-print( "Saving the indo fashion classification report in the folder ´out´")
+print( "Saving the skin cancer classification report in the folder ´out´")
+
 

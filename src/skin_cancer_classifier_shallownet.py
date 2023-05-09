@@ -15,7 +15,7 @@ import os, sys
 import matplotlib.pyplot as plt
 
 # data 
-import data2 as dt
+import data as dt
 
 # tf tools 
 import tensorflow as tf
@@ -156,9 +156,9 @@ test_ds =test_datagen.flow_from_dataframe(
 ############## Shallow net MODEL  ###############
 #the layers are just added one at a time :) 
 # Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
-#early_stopping = EarlyStopping(monitor = "val_loss", # watch the val loss metric
-#                            patience = 5,
-#                            restore_best_weights = True)
+early_stopping = EarlyStopping(monitor = "val_loss", # watch the val loss metric
+                            patience = 5,
+                            restore_best_weights = True)
 
 #initalise model
 model = Sequential()
@@ -195,11 +195,11 @@ model.compile(optimizer=sgd,
 
 ############## FIT & TRAIN #################
 
-epochs = 20
+epochs = 25
 history = model.fit(train_ds,
                     validation_data=val_ds,
-                    epochs=epochs#,
-                    #callbacks=[early_stopping]
+                    epochs=epochs,
+                    callbacks=[early_stopping]
                     )
 
 ############ plot model #######
@@ -217,5 +217,14 @@ report=(classification_report(test_ds.classes, # y_test
                                             target_names=test_ds.class_indices.keys())) #labels
 
 print(report)
+# Define outpath for classification report
+outpath_report = os.path.join(os.getcwd(), "out", "shallownet.txt")
+
+# Save the  classification report
+file = open(outpath_report, "w")
+file.write(report)
+file.close()
+
+print( "Saving the skin cancer classification report in the folder ´out´")
 
 
