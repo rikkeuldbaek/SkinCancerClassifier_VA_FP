@@ -40,7 +40,7 @@ plt.rcParams["figure.figsize"] = [10, 10]
 plt.rcParams["figure.autolayout"] = False
 #### PLOTTING EACH IMAGE ####
 plt.subplot(3, 3, 1)
-plt.title("Diagnostic Categories of Skin Cancer")
+plt.title("Plot 1: Diagnostic Categories of Skin Cancer")
 plt.imshow(plt.imread(samples['image'].iloc[0]))
 plt.title(samples['label'].iloc[0])
 plt.subplot(3, 3, 2)
@@ -75,7 +75,7 @@ plt.close()
 ax = df['label'].value_counts().plot(kind='bar',
                                     figsize=(10,8),
                                     color=['#9b5fe0','#f9a52c', '#16a4d8', '#60dbe8', '#8bd346', '#efdf48', '#d64e12' ])
-ax.set_title("Unbalanced Distribution of Diagnostic Categories", fontsize=20)
+ax.set_title("Plot 2: Unbalanced Distribution of Diagnostic Categories", fontsize=20)
 ax.set_xlabel("Diagnostic Categories", fontsize=14)
 ax.set_ylabel("Frequency",fontsize=14)
 plt.show()
@@ -87,7 +87,7 @@ plt.close()
 ax = lil_df['label'].value_counts().plot(kind='bar',
                                     figsize=(10,8),
                                     color=['#9b5fe0','#f9a52c', '#16a4d8', '#60dbe8', '#8bd346', '#efdf48', '#d64e12' ])
-ax.set_title("Balanced Distribution of Diagnostic Categories", fontsize=20)
+ax.set_title("Plot 3: Balanced Distribution of Diagnostic Categories", fontsize=20)
 ax.set_xlabel("Diagnostic Categories", fontsize=14)
 ax.set_ylabel("Frequency", fontsize=14)
 plt.show()

@@ -35,8 +35,14 @@ For this final project I have used the *HAM10000 dataset* ("Human Against Machin
 ![Diagnostic Categories of Skin Cancer](sample_pngs/diagnostic_categories.png)
 
 
+The distribution of the diagnostic categories of skin cancer was intitially rather unbalanced, as seen from plot 1. Thus, a maximum limit of 500 samples per diagnostic category was established, although some categories had less than 500 data points. This resulted in a slightly more balanced dataset, however it is not completely balanced out as visually evident from plot 2. 
 
-The distribution of data within 
+![Unbalanced data](sample_pngs/unbalanced_distribution.png)
+
+![Balanced Data](sample_pngs/balanced_distribution.png)
+
+
+
 
 
 <br>
