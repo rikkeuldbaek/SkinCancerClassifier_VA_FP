@@ -13,7 +13,7 @@ https://github.com/rikkeuldbaek/SkinCancerClassifier_VA_FP
 
 # **1.2 Description**
 
-For this final project I have worked with a collection of dermatoscopic images with different types of pigmented skin lesions, i.e., skin cancer, in order to build a classifier that is able to segment and classify different types of skin cancer. This repository contains source code which trains a *pretrained CNN* on the skin cancer dataset (*the HAM10000 dataset*), classifies the skin cancer types and produces a classification report and a training/validation history plot, in order to evaluate the performance of the classifier. 
+For this final project I have worked with a collection of dermatoscopic images with different categories of pigmented skin lesions, i.e., skin cancer, in order to build a classifier that is able to segment and classify different diagnostic categories of skin cancer. This repository contains source code which trains a *pretrained CNN* on the skin cancer dataset (*the HAM10000 dataset*), classifies the diagnostic categories of skin cancer and produces a classification report and a training/validation history plot, in order to evaluate the performance of the classifier. 
 
 
 
@@ -29,7 +29,12 @@ For this final project I have worked with a collection of dermatoscopic images w
 <br>
 
 # **1.4 Data**
-For this final project I have used the *HAM10000 dataset* ("Human Against Machine with 10000 training images"). This dataset contains 10015 multi-source dermatoscopic images of common pigmented skin lesions, also known as skin cancer. This collection of images of skin cancer includes seven representative diagnostic categories within the domain of pigmented lessions. These seven categories are: Actinic keratoses and intraepithelial carcinoma / Bowen's disease (AKIEC), basal cell carcinoma (BCC), benign keratosis-like lesions (solar lentigines / seborrheic keratoses and lichen-planus like keratoses, BKL), dermatofibroma (df), melanoma (MEL), melanocytic nevi (NV) and vascular lesions (angiomas, angiokeratomas, pyogenic granulomas and hemorrhage, VASC) **KILDE**. Furthermore, the *HAM10000 dataset* consists of a *Ground Truth* .csv file matching each image filename to its diagnostic category.
+For this final project I have used the *HAM10000 dataset* ("Human Against Machine with 10000 training images"). This dataset contains 10015 multi-source dermatoscopic images of common pigmented skin lesions, also known as skin cancer. This collection of images of skin cancer includes seven representative diagnostic categories within the domain of pigmented lessions. These seven categories are: Actinic keratoses and intraepithelial carcinoma / Bowen's disease (AKIEC), basal cell carcinoma (BCC), benign keratosis-like lesions (solar lentigines / seborrheic keratoses and lichen-planus like keratoses, BKL), dermatofibroma (df), melanoma (MEL), melanocytic nevi (NV) and vascular lesions (angiomas, angiokeratomas, pyogenic granulomas and hemorrhage, VASC) (Tschandl, 2018). Furthermore, the *HAM10000 dataset* consists of a *Ground Truth* .csv file matching each image filename to its diagnostic category. The plot below illustrates each of the seven diagnostic categories of skin cancer.
+
+#### **Diagnostic Categories of Skin Cancer** 
+![Diagnostic Categories of Skin Cancer](sample_pngs/diagnostic_categories.png)
+
+
 
 The distribution of data within 
 
@@ -107,7 +112,9 @@ From the results of the complex image search algorithm, three out of five
 
 ## **Resources**
 [HAM10000 dataset](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DBW86T)
-INSERT ZOTERO LINK FOR DATA
+
+
+Tschandl, P. (2018). The HAM10000 dataset, a large collection of multi-source dermatoscopic images of common pigmented skin lesions (ViDIR Group, Ed.; V4 ed.). Harvard Dataverse. https://doi.org/10.7910/DVN/DBW86T
 
 
 

@@ -59,12 +59,12 @@ for label in df['label'].unique():
     else:        
         sample=Lgroup.sample(frac=1, axis=0)
     samples.append(sample) 
-df=pd.concat(samples, axis=0).reset_index(drop=True)
+lil_df=pd.concat(samples, axis=0).reset_index(drop=True)
 
 print( "***"*15)
-print('Number of data points: ', len(df))
+print('Number of data points: ', len(lil_df))
 print('Balanced label distribution: ')  
-print (df['label'].value_counts())  
+print (lil_df['label'].value_counts())  
 print( "***"*15)
 print( "  "*15)
 
@@ -78,7 +78,7 @@ valid_split=.10 # percentage of data used for validation
 test_val_split = valid_split/(1-train_split) # split of 0.5 
 
 # Splitting data into train df and remaining data
-train_df, remaining_data = train_test_split(df, train_size=train_split, shuffle=True, random_state=1)
+train_df, remaining_data = train_test_split(lil_df, train_size=train_split, shuffle=True, random_state=1)
 
 # Splitting remaining data into validation and test df
 val_df, test_df=train_test_split(remaining_data, train_size= test_val_split, shuffle=True, random_state=1)
@@ -93,48 +93,3 @@ print('test_df length: ', len(test_df))
 print( "---"*15)
 print( 'valid_df length: ', len(val_df))
 print( "***"*15)
-
-
- 
-################## PLOTTING THE SAMPLE ##################
-# Isolate a sample of each diagnostic category (label)
-group=df.groupby('label')
-samples = group.sample(1, random_state =6)
-
-# Convert image column to be a full path
-def convert_image_path(image_path):
-    base_dir = os.path.join(os.getcwd(),"data","archive","images")
-    return os.path.join(base_dir, image_path)
-
-samples['image'] = samples['image'].apply(convert_image_path)
-
-
-# Display the 7 diagnostic categories of the dataset with their labels
-plt.rcParams["figure.figsize"] = [10, 10]
-plt.rcParams["figure.autolayout"] = False
-#### PLOTTING EACH IMAGE ####
-plt.subplot(3, 3, 1)
-plt.title("Diagnostic Categories of Skin Cancer")
-plt.imshow(plt.imread(samples['image'].iloc[0]))
-plt.title(samples['label'].iloc[0])
-plt.subplot(3, 3, 2)
-plt.imshow(plt.imread(samples['image'].iloc[1]))
-plt.title(samples['label'].iloc[1])
-plt.subplot(3, 3, 3)
-plt.imshow(plt.imread(samples['image'].iloc[2]))
-plt.title(samples['label'].iloc[2])
-plt.subplot(3, 3, 4)
-plt.imshow(plt.imread(samples['image'].iloc[3]))
-plt.title(samples['label'].iloc[3])
-plt.show()
-plt.subplot(3, 3, 5)
-plt.imshow(plt.imread(samples['image'].iloc[4]))
-plt.title(samples['label'].iloc[4])
-plt.subplot(3, 3, 6)
-plt.imshow(plt.imread(samples['image'].iloc[5]))
-plt.title(samples['label'].iloc[5])
-plt.subplot(3, 3, 7)
-plt.imshow(plt.imread(samples['image'].iloc[6]))
-plt.title(samples['label'].iloc[6])
-plt.show()
-plt.savefig('sample_pngs/diagnostic_categories.png') #save figures in folder "sample_pngs"

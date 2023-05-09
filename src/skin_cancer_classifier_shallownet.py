@@ -89,7 +89,7 @@ batch_size = 32
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 30
+n_epochs = 25
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
@@ -195,10 +195,9 @@ model.compile(optimizer=sgd,
 
 ############## FIT & TRAIN #################
 
-epochs = 25
 history = model.fit(train_ds,
                     validation_data=val_ds,
-                    epochs=epochs,
+                    epochs=n_epochs,
                     callbacks=[early_stopping]
                     )
 

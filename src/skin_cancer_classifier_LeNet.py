@@ -80,16 +80,16 @@ import helper_func as hf
 #load in data
 train_df = dt.train_df
 test_df = dt.test_df
-
+val_df = dt.val_df
 
 #################### Prepping variables ####################
 
-#data_directory = os.path.join(os.getcwd(), "skin_data")
-batch_size = 64
-img_height = 180
-img_width = 180
-target_size = (180,180)
-n_epochs = 20
+batch_size = 32
+img_height = 224
+img_width = 224
+target_size = (224,224)
+n_epochs = 25
+directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
 
@@ -102,35 +102,35 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             zoom_range=0.2, #Range for random zoom
                             brightness_range=(0.2, 0.8),
                             rotation_range=20, #Degree range for random rotations.
-                            rescale=1./255.,# rescaling factor 
-                            validation_split=0.2) # validation split
+                            rescale=1./255.) #, # rescaling factor 
+                            #validation_split=0.4) # validation split
 
 
 # training data
 train_ds = datagen.flow_from_dataframe(
                     dataframe= train_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=True,
-                    class_mode= "binary",
-                    subset="training",
+                    class_mode= "categorical",
+                    #subset="training", 
                     target_size=target_size)
 
 
 # validation data
 val_ds =datagen.flow_from_dataframe(
-                    dataframe=train_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    dataframe=val_df,
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
-                    subset="validation",
+                    #subset="validation",
                     shuffle=True,
-                    class_mode= "binary",
+                    class_mode= "categorical",
                     target_size=target_size)
 
 
@@ -139,22 +139,14 @@ test_datagen=ImageDataGenerator(rescale=1./255.)
 # test data
 test_ds =test_datagen.flow_from_dataframe(
                     dataframe=test_df,
-                    #directory= df["filepath"] #none because the filepath is complete
-                    x_col="filepaths",
-                    y_col="labels",
+                    directory = directory,
+                    x_col="image",
+                    y_col="label",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=False,
-                    class_mode= "binary",
+                    class_mode= "categorical",
                     target_size=target_size)
-
-
-# output from generators
-print(train_ds.class_indices.keys())#unique labels ['Cancer', 'Non_cancer']
-print(train_ds.class_indices)#unique labels ['Cancer':0, 'Non_cancer':1 ]
-
-
-############## PLOT SAMPLE ################
 
 
 
@@ -178,7 +170,7 @@ model = Sequential()
 model.add(Conv2D(32, # input nodes
                  (3,3), # kernel size
                  padding="same",
-                 input_shape=(180,180,3)))
+                 input_shape=(224,224,3)))
 model.add(Activation("relu"))
 model.add(MaxPooling2D(pool_size = (2,2),
                        strides = (2,2)))# how far we step up and down (thus 2 values), 2 up and 2 down
@@ -196,8 +188,8 @@ model.add(Dense(128))
 model.add(Activation("relu"))
 
 # softmax classifier
-model.add(Dense(1))
-model.add(Activation("sigmoid"))
+model.add(Dense(7))
+model.add(Activation("softmax"))
 
 
 #print(model.summary())
@@ -208,21 +200,42 @@ model.add(Activation("sigmoid"))
 
 ############## FIT & TRAIN #################
 model.compile(optimizer = tf.optimizers.Adam(),
-              loss = 'binary_crossentropy',
+              loss = 'categorical_crossentropy',
               metrics=['accuracy'])
 
-epochs = 20
 history = model.fit(train_ds,
                     validation_data=val_ds,
-                    epochs=epochs)
+                    epochs= n_epochs)
 
 
 ############ plot model #######
-hf.plot_history(history, n_epochs)
+#hf.plot_history(history, n_epochs)
 
 ####### evaluate
 loss, accuracy = model.evaluate(test_ds)
 
 print("Loss: ", loss)
 print("Accuracy: ", accuracy)
+
+predictions = model.predict(test_ds, # X_test
+                            batch_size=batch_size)
+
+
+# Make classification report
+report=(classification_report(test_ds.classes, # y_test 
+                                            predictions.argmax(axis=1),
+                                            target_names=test_ds.class_indices.keys())) #labels
+
+print(report)
+# Define outpath for classification report
+outpath_report = os.path.join(os.getcwd(), "out", "LeNet.txt")
+
+# Save the  classification report
+file = open(outpath_report, "w")
+file.write(report)
+file.close()
+
+print( "Saving the skin cancer classification report in the folder ´out´")
+
+
 

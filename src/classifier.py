@@ -15,7 +15,7 @@ import os, sys
 import matplotlib.pyplot as plt
 
 # data 
-import data2 as dt
+import data as dt
 
 # tf tools 
 import tensorflow as tf
@@ -63,7 +63,7 @@ val_df = dt.val_df
 
 #################### Prepping variables ####################
 
-batch_size = 32
+batch_size = 10
 img_height = 224
 img_width = 224
 target_size = (224,224)
