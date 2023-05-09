@@ -173,7 +173,7 @@ model.add(Conv2D(32, # input nodes
                  input_shape=(224,224,3)))
 model.add(Activation("relu"))
 model.add(MaxPooling2D(pool_size = (2,2),
-                       strides = (2,2)))# how far we step up and down (thus 2 values), 2 up and 2 down
+                       strides = (2,2)))
 
 # second set of layers CONV => RELU => MAXPOOL
 model.add(Conv2D(50, (5,5), 
