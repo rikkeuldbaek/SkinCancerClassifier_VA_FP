@@ -15,11 +15,11 @@ import os
 ##################### UNZIPPING #######################
 
 # define path for zipfile of images
-skin_cancer_path="/work/VA_final_project/skin_cancer/archive.zip"
+skin_cancer_path = os.path.join(os.getcwd(), "data", "archive.zip")
      
 
 # reading in files
-with zipfile.ZipFile(skin_cancer_path, mode="r") as archive:
+with ZipFile(skin_cancer_path, mode="r") as archive:
     badfiles=archive.testzip()
     print(badfiles) #print if any files are corrupted
     archive.extractall("data/")

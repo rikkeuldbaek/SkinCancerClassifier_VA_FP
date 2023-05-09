@@ -64,7 +64,7 @@ plt.imshow(plt.imread(samples['image'].iloc[6]))
 plt.title(samples['label'].iloc[6])
 plt.grid(False)
 plt.show()
-plt.savefig('sample_pngs/diagnostic_categories.png') #save figures in folder "sample_pngs"
+plt.savefig('readme_pngs/diagnostic_categories.png')
 plt.close()
 
 
@@ -79,7 +79,7 @@ ax.set_title("Plot 2: Unbalanced Distribution of Diagnostic Categories", fontsiz
 ax.set_xlabel("Diagnostic Categories", fontsize=14)
 ax.set_ylabel("Frequency",fontsize=14)
 plt.show()
-plt.savefig('sample_pngs/unbalanced_distribution.png') #save figures in folder "sample_pngs"
+plt.savefig('readme_pngs/unbalanced_distribution.png')
 plt.close()
 
 
@@ -91,5 +91,5 @@ ax.set_title("Plot 3: Balanced Distribution of Diagnostic Categories", fontsize=
 ax.set_xlabel("Diagnostic Categories", fontsize=14)
 ax.set_ylabel("Frequency", fontsize=14)
 plt.show()
-plt.savefig('sample_pngs/balanced_distribution.png') #save figures in folder "sample_pngs"
+plt.savefig('readme_pngs/balanced_distribution.png')
 plt.close()

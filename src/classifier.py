@@ -63,7 +63,7 @@ val_df = dt.val_df
 
 #################### Prepping variables ####################
 
-batch_size = 32
+batch_size = 24
 img_height = 224
 img_width = 224
 target_size = (224,224)
@@ -230,7 +230,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "VGG16.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "classification_report.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")

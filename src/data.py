@@ -71,8 +71,8 @@ print( "  "*15)
 
 
 ##################### TEST AND TRAIN SPLIT #####################
-train_split=.80 # percentage of data used for training
-valid_split=.10 # percentage of data used for validation
+train_split=.70 # percentage of data used for training
+valid_split=.15 # percentage of data used for validation
 
 # percentage of data used for test is 1-train_split-valid_split 
 test_val_split = valid_split/(1-train_split) # split of 0.5 
