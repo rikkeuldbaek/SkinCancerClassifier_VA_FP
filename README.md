@@ -32,14 +32,14 @@ For this final project I have worked with a collection of dermatoscopic images w
 For this final project I have used the *HAM10000 dataset* ("Human Against Machine with 10000 training images"). This dataset contains 10015 multi-source dermatoscopic images of common pigmented skin lesions, also known as skin cancer. This collection of images of skin cancer includes seven representative diagnostic categories within the domain of pigmented lessions. These seven categories are: Actinic keratoses and intraepithelial carcinoma / Bowen's disease (AKIEC), basal cell carcinoma (BCC), benign keratosis-like lesions (solar lentigines / seborrheic keratoses and lichen-planus like keratoses, BKL), dermatofibroma (df), melanoma (MEL), melanocytic nevi (NV) and vascular lesions (angiomas, angiokeratomas, pyogenic granulomas and hemorrhage, VASC) (Tschandl, 2018). Furthermore, the *HAM10000 dataset* consists of a *Ground Truth* .csv file matching each image filename to its diagnostic category. The plot below illustrates each of the seven diagnostic categories of skin cancer.
 
 #### **Diagnostic Categories of Skin Cancer** 
-![Diagnostic Categories of Skin Cancer](sample_pngs/diagnostic_categories.png)
+![Diagnostic Categories of Skin Cancer](readme_pngs/diagnostic_categories.png)
 
 
 The distribution of the diagnostic categories of skin cancer was intitially rather unbalanced, as seen from plot 1. For instance the data contained 6705 images of the diagnostic category *NV*, while containing 115 images of the diagnostic category *DF*. Thus, a maximum limit of 500 samples per diagnostic category was established, although some categories had less than 500 data points. This resulted in a slightly more balanced dataset, however it is not completely balanced out as visually evident from plot 2. Furthermore, this maximum limit of 500 samples per diagnostic category decreased the sample size substantially from 10015 images to 2584 images, which may have a great impact on the modelling. 
 
-![Unbalanced data](sample_pngs/unbalanced_distribution.png)
+![Unbalanced data](readme_pngs/unbalanced_distribution.png)
 
-![Balanced Data](sample_pngs/balanced_distribution.png)
+![Balanced Data](readme_pngs/balanced_distribution.png)
 
 
 
