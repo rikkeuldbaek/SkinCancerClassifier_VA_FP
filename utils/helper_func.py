@@ -27,7 +27,7 @@ def plot_history(H, epochs):
     plt.tight_layout()
     plt.legend()
     plt.show()
-    plt.savefig('out/train_val_history_plot_skincan.png') #save figures in folder "out"
+    plt.savefig('out/train_val_history_plot_skincan3.png') #save figures in folder "out"
 
 
 

@@ -15,7 +15,7 @@ import os, sys
 import matplotlib.pyplot as plt
 
 # data 
-import data2 as dt
+import data as dt
 
 # tf tools 
 import tensorflow as tf
@@ -80,17 +80,16 @@ import helper_func as hf
 #load in data
 train_df = dt.train_df
 test_df = dt.test_df
-val_df = dt.val_df
 
 
 #################### Prepping variables ####################
 
-batch_size = 32
-img_height = 224
-img_width = 224
-target_size = (224,224)
-n_epochs = 30
-directory= os.path.join(os.getcwd(),"data","archive","images")
+#data_directory = os.path.join(os.getcwd(), "skin_data")
+batch_size = 64
+img_height = 180
+img_width = 180
+target_size = (180,180)
+n_epochs = 20
 
 #################### Data generator ####################
 
@@ -103,35 +102,35 @@ datagen=ImageDataGenerator(horizontal_flip= True,
                             zoom_range=0.2, #Range for random zoom
                             brightness_range=(0.2, 0.8),
                             rotation_range=20, #Degree range for random rotations.
-                            rescale=1./255.) #, # rescaling factor 
-                            #validation_split=0.4) # validation split
+                            rescale=1./255.,# rescaling factor 
+                            validation_split=0.2) # validation split
 
 
 # training data
 train_ds = datagen.flow_from_dataframe(
                     dataframe= train_df,
-                    directory = directory,
-                    x_col="image",
-                    y_col="label",
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=True,
-                    class_mode= "categorical",
-                    #subset="training", 
+                    class_mode= "binary",
+                    subset="training",
                     target_size=target_size)
 
 
 # validation data
 val_ds =datagen.flow_from_dataframe(
-                    dataframe=val_df,
-                    directory = directory,
-                    x_col="image",
-                    y_col="label",
+                    dataframe=train_df,
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
                     batch_size=batch_size,
                     seed=666,
-                    #subset="validation",
+                    subset="validation",
                     shuffle=True,
-                    class_mode= "categorical",
+                    class_mode= "binary",
                     target_size=target_size)
 
 
@@ -140,82 +139,90 @@ test_datagen=ImageDataGenerator(rescale=1./255.)
 # test data
 test_ds =test_datagen.flow_from_dataframe(
                     dataframe=test_df,
-                    directory = directory,
-                    x_col="image",
-                    y_col="label",
+                    #directory= df["filepath"] #none because the filepath is complete
+                    x_col="filepaths",
+                    y_col="labels",
                     batch_size=batch_size,
                     seed=666,
                     shuffle=False,
-                    class_mode= "categorical",
+                    class_mode= "binary",
                     target_size=target_size)
 
 
+# output from generators
+print(train_ds.class_indices.keys())#unique labels ['Cancer', 'Non_cancer']
+print(train_ds.class_indices)#unique labels ['Cancer':0, 'Non_cancer':1 ]
 
+
+############## PLOT SAMPLE ################
+
+
+
+
+############## CHECK DATA ################
+#check shapes of generated train_ds
+for image_batch, labels_batch in train_ds:
+    print(image_batch.shape)
+    print(labels_batch.shape)
+    #check the images are standardized 
+    first_image = image_batch[0]
+    print(np.min(first_image), np.max(first_image)) # pixel values should be between 0 and 1
+    break
 
 
 ############## Shallow net MODEL  ###############
-#the layers are just added one at a time :) 
-# Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
-#early_stopping = EarlyStopping(monitor = "val_loss", # watch the val loss metric
-#                            patience = 5,
-#                            restore_best_weights = True)
-
-#initalise model
+# define model
 model = Sequential()
 
-# define CONV => ReLU
-model.add(Conv2D(32, #nodes
-                (3,3), #kernel size
-                padding = "same", # make 0 instead maybe
-                input_shape = (224,224,3))) # what size of input image they take
-model.add(Activation("relu")) #activation function - overcomming vanishing gradients 
-          
-# FC classifier
-model.add(Flatten()) # flatten to a single image embedding array (extracted features)
-model.add(Dense(128)) #layer with 128 nodes
+# first set of layers CONV => RELU => MAXPOOL
+model.add(Conv2D(32, # input nodes
+                 (3,3), # kernel size
+                 padding="same",
+                 input_shape=(180,180,3)))
 model.add(Activation("relu"))
-model.add(Dense(7)) #output layer with 1 node
-model.add(Activation("softmax"))
+model.add(MaxPooling2D(pool_size = (2,2),
+                       strides = (2,2)))# how far we step up and down (thus 2 values), 2 up and 2 down
 
+# second set of layers CONV => RELU => MAXPOOL
+model.add(Conv2D(50, (5,5), 
+                 padding="same"))
+model.add(Activation("relu"))
+model.add(MaxPooling2D(pool_size = (2,2),
+                       strides = (2,2)))
 
+# FC => RELU
+model.add(Flatten())
+model.add(Dense(128))
+model.add(Activation("relu"))
 
-
-lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-    initial_learning_rate= 0.01,
-    decay_steps=10000,
-    decay_rate=0.9)
-sgd = SGD(learning_rate=lr_schedule)
-
-model.compile(optimizer=sgd,
-            loss='categorical_crossentropy',
-            metrics=['accuracy'])
+# softmax classifier
+model.add(Dense(1))
+model.add(Activation("sigmoid"))
 
 
 #print(model.summary())
 
+
+
+
+
 ############## FIT & TRAIN #################
+model.compile(optimizer = tf.optimizers.Adam(),
+              loss = 'binary_crossentropy',
+              metrics=['accuracy'])
 
 epochs = 20
 history = model.fit(train_ds,
                     validation_data=val_ds,
-                    epochs=epochs#,
-                    #callbacks=[early_stopping]
-                    )
+                    epochs=epochs)
+
 
 ############ plot model #######
-#hf.plot_history(history, n_epochs)
+hf.plot_history(history, n_epochs)
 
+####### evaluate
+loss, accuracy = model.evaluate(test_ds)
 
-################### MODEL PREDICT ########################
-predictions = model.predict(test_ds, # X_test
-                            batch_size=batch_size)
-
-
-# Make classification report
-report=(classification_report(test_ds.classes, # y_test 
-                                            predictions.argmax(axis=1),
-                                            target_names=test_ds.class_indices.keys())) #labels
-
-print(report)
-
+print("Loss: ", loss)
+print("Accuracy: ", accuracy)
 
