@@ -2,4 +2,4 @@
 
 # run the code
 #python src/unzip_data.py 
-python src/skin_cancer_classifier #add arguments here
+python src/classifier.py #add arguments here

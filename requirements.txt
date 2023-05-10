@@ -9,5 +9,5 @@ scikit_learn
 tqdm
 seaborn
 scikit-multilearn
-pip install opencv-python-headless 
+opencv-python-headless 
 

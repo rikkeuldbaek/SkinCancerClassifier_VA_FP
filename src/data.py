@@ -13,9 +13,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import os
 
-# Data visualization libraries
-import matplotlib.pyplot as plt
-import cv2
+# Ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
 
 ################# DF PREPROCESSING THE GROUNDTRUTH.CSV #################
 
@@ -41,7 +41,7 @@ df=df.drop(labels, axis=1)
 
 
 #################### FIX UNBALANCED TRAIN DATA #####################
-# Current label distribution
+# Current label distribution (unbalanced)
 print( "***"*15)
 print('Number of data points: ', len(df))
 print('Unbalanced label distribution: ')
@@ -61,6 +61,7 @@ for label in df['label'].unique():
     samples.append(sample) 
 lil_df=pd.concat(samples, axis=0).reset_index(drop=True)
 
+# print slightly more balanced data
 print( "***"*15)
 print('Number of data points: ', len(lil_df))
 print('Balanced label distribution: ')  
@@ -71,17 +72,17 @@ print( "  "*15)
 
 
 ##################### TEST AND TRAIN SPLIT #####################
-train_split=.80 # percentage of data used for training
-valid_split=.10 # percentage of data used for validation
+train_split=.70 # percentage of data used for training
+valid_split=.15 # percentage of data used for validation
 
 # percentage of data used for test is 1-train_split-valid_split 
 test_val_split = valid_split/(1-train_split) # split of 0.5 
 
 # Splitting data into train df and remaining data
-train_df, remaining_data = train_test_split(lil_df, train_size=train_split, shuffle=True, random_state=1)
+train_df, remaining_data = train_test_split(lil_df, train_size=train_split, shuffle=True, random_state=188)
 
 # Splitting remaining data into validation and test df
-val_df, test_df=train_test_split(remaining_data, train_size= test_val_split, shuffle=True, random_state=1)
+val_df, test_df=train_test_split(remaining_data, train_size= test_val_split, shuffle=True, random_state=188)
 
 # Printing splits
 print( "***"*15)
