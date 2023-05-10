@@ -10,7 +10,7 @@
 # Install packages
 # data wrangeling/path tools/plotting tools 
 import pandas as pd
-import numpy as np
+import numpy as np 
 import os, sys
 import matplotlib.pyplot as plt
 
@@ -63,11 +63,11 @@ val_df = dt.val_df
 
 #################### Prepping variables ####################
 
-batch_size = 24
+batch_size = 30
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 25
+n_epochs = 30
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
@@ -166,21 +166,15 @@ for layer in model.layers:
 flat1 = Flatten()(model.layers[-1].output)
 bn = BatchNormalization()(flat1) #normalize the feature weights 
 # 1st layer
-class1 = Dense(256, 
+class1 = Dense(300, 
             activation="relu")(bn)
 # 2nd layer               
-class2 = Dense(128, 
+class2 = Dense(150, 
             activation="relu")(class1)
 
-# 3rd layer               
-class3 = Dense(90, 
-            activation="relu")(class2)
-# 4th layer               
-class4 = Dense(30, 
-            activation="relu")(class3)
 # output layer    
 output = Dense(7, #7 lables
-            activation="softmax")(class4) 
+            activation="softmax")(class2) 
 
 # define new model
 model = Model(inputs=model.inputs, 

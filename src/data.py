@@ -13,9 +13,9 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 import os
 
-# Data visualization libraries
-import matplotlib.pyplot as plt
-import cv2
+# Ignore warnings
+import warnings
+warnings.filterwarnings("ignore")
 
 ################# DF PREPROCESSING THE GROUNDTRUTH.CSV #################
 
@@ -41,7 +41,7 @@ df=df.drop(labels, axis=1)
 
 
 #################### FIX UNBALANCED TRAIN DATA #####################
-# Current label distribution
+# Current label distribution (unbalanced)
 print( "***"*15)
 print('Number of data points: ', len(df))
 print('Unbalanced label distribution: ')
@@ -61,6 +61,7 @@ for label in df['label'].unique():
     samples.append(sample) 
 lil_df=pd.concat(samples, axis=0).reset_index(drop=True)
 
+# print slightly more balanced data
 print( "***"*15)
 print('Number of data points: ', len(lil_df))
 print('Balanced label distribution: ')  
