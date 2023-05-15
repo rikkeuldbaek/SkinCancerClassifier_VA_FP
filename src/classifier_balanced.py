@@ -1,4 +1,4 @@
-### Skin Cancer Detection Model
+### Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
 # Date: 27th of April 2023
@@ -10,7 +10,7 @@
 # Install packages
 # data wrangeling/path tools/plotting tools 
 import pandas as pd
-import numpy as np
+import numpy as np 
 import os, sys
 import matplotlib.pyplot as plt
 
@@ -50,46 +50,24 @@ from tensorflow.keras.callbacks import EarlyStopping
 from sklearn.preprocessing import LabelBinarizer
 from sklearn.metrics import classification_report
 
-# data tools 
-import os
-import numpy as np
-import matplotlib.pyplot as plt
-
-# sklearn tools
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import classification_report
-
-# tf tools
-from tensorflow.keras.datasets import cifar10
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import (Conv2D, 
-                                     MaxPooling2D, 
-                                     Activation, 
-                                     Flatten, 
-                                     Dense)
-from tensorflow.keras.utils import plot_model
-from tensorflow.keras.optimizers import SGD
-from tensorflow.keras import backend as K
-
-
 
 # Import predefined helper functions (for plotting)
 sys.path.append(os.path.join("utils"))
 import helper_func as hf
 
 #load in data
-train_df = dt.train_df
-test_df = dt.test_df
-val_df = dt.val_df
+train_df = dt.train_df_bal
+test_df = dt.test_df_bal
+val_df = dt.val_df_bal
 
 
 #################### Prepping variables ####################
 
-batch_size = 32
+batch_size = 30
 img_height = 224
 img_width = 224
 target_size = (224,224)
-n_epochs = 25
+n_epochs = 30
 directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
@@ -151,35 +129,42 @@ test_ds =test_datagen.flow_from_dataframe(
 
 
 
+############## LOAD MODEL ################
+# load the pretrained VGG16 model without classifier layers
+model = VGG16(include_top=False, 
+            pooling="avg", 
+            input_shape= (224, 224, 3))
 
 
-############## Shallow net MODEL  ###############
-#the layers are just added one at a time :) 
-# Setup EarlyStopping callback to stop training if model's val_loss doesn't improve for 3 epochs
-early_stopping = EarlyStopping(monitor = "val_loss", # watch the val loss metric
-                            patience = 5,
-                            restore_best_weights = True)
-
-#initalise model
-model = Sequential()
-
-# define CONV => ReLU
-model.add(Conv2D(32, #nodes
-                (3,3), #kernel size
-                padding = "same", # make 0 instead maybe
-                input_shape = (224,224,3))) # what size of input image they take
-model.add(Activation("relu")) #activation function - overcomming vanishing gradients 
-          
-# FC classifier
-model.add(Flatten()) # flatten to a single image embedding array (extracted features)
-model.add(Dense(128)) #layer with 128 nodes
-model.add(Activation("relu"))
-model.add(Dense(7)) #output layer with 1 node
-model.add(Activation("softmax"))
+# mark loaded layers as not trainable
+for layer in model.layers:
+    layer.trainable = False #resetting 
+# we only wanna update the classification layer in the end,
+# so now we "freeze" all weigths in the feature extraction part and make them "untrainable"
 
 
 
+########## adding classification layers #########
 
+# add new classifier layers
+flat1 = Flatten()(model.layers[-1].output)
+bn = BatchNormalization()(flat1) #normalize the feature weights 
+# 1st layer
+class1 = Dense(300, 
+            activation="relu")(bn)
+# 2nd layer               
+class2 = Dense(150, 
+            activation="relu")(class1)
+
+# output layer    
+output = Dense(7, #7 lables
+            activation="softmax")(class2) 
+
+# define new model
+model = Model(inputs=model.inputs, 
+            outputs=output)
+
+# compile
 lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
     initial_learning_rate= 0.01,
     decay_steps=10000,
@@ -191,19 +176,25 @@ model.compile(optimizer=sgd,
             metrics=['accuracy'])
 
 
-#print(model.summary())
+
 
 ############## FIT & TRAIN #################
 
-history = model.fit(train_ds,
-                    validation_data=val_ds,
-                    epochs=n_epochs,
-                    callbacks=[early_stopping]
-                    )
+#model
+skin_cancer_classifier = model.fit(train_ds,
+                    steps_per_epoch= train_ds.samples // batch_size,
+                    epochs = n_epochs,
+                    validation_data=train_ds,
+                    validation_steps= val_ds.samples // batch_size,
+                    batch_size = batch_size,
+                    verbose = 1)#,
+                    #callbacks=[EarlyStopping(monitor='val_loss', patience=1, restore_best_weights = True)]
+                    #)
 
-############ plot model #######
-#hf.plot_history(history, n_epochs)
 
+
+############ EVALUATION #####################
+hf.plot_history_bal(skin_cancer_classifier, n_epochs)
 
 ################### MODEL PREDICT ########################
 predictions = model.predict(test_ds, # X_test
@@ -217,7 +208,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "shallownet.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "classification_report_balanced.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")

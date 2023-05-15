@@ -56,13 +56,12 @@ sys.path.append(os.path.join("utils"))
 import helper_func as hf
 
 #load in data
-train_df = dt.train_df
-test_df = dt.test_df
-val_df = dt.val_df
+train_df = dt.train_df_ubal
+test_df = dt.test_df_ubal
+val_df = dt.val_df_ubal
 
 
 #################### Prepping variables ####################
-
 batch_size = 30
 img_height = 224
 img_width = 224
@@ -72,8 +71,7 @@ directory= os.path.join(os.getcwd(),"data","archive","images")
 
 #################### Data generator ####################
 
-# Specify Image Data Generator 
-
+# Specify Image Data Generator for train and validation data
 datagen=ImageDataGenerator(horizontal_flip= True,
                             vertical_flip=True,
                             zca_whitening = True,
@@ -113,6 +111,7 @@ val_ds =datagen.flow_from_dataframe(
                     target_size=target_size)
 
 
+# image data generator for test data
 test_datagen=ImageDataGenerator(rescale=1./255.)
 
 # test data
@@ -128,23 +127,6 @@ test_ds =test_datagen.flow_from_dataframe(
                     target_size=target_size)
 
 
-
-############## PLOT SAMPLE ################
-
-
-
-############## CHECK DATA ################
-#check shapes of generated train_ds
-for image_batch, labels_batch in train_ds:
-    print(image_batch.shape)
-    print(labels_batch.shape)
-    #check the images are standardized 
-    first_image = image_batch[0]
-    print(np.min(first_image), np.max(first_image)) # pixel values should be between 0 and 1
-    break
-
-
-
 ############## LOAD MODEL ################
 # load the pretrained VGG16 model without classifier layers
 model = VGG16(include_top=False, 
@@ -155,13 +137,12 @@ model = VGG16(include_top=False,
 # mark loaded layers as not trainable
 for layer in model.layers:
     layer.trainable = False #resetting 
-# we only wanna update the classification layer in the end,
-# so now we "freeze" all weigths in the feature extraction part and make them "untrainable"
+# I only wanna update the classification layer in the end,
+# so now I "freeze" all weigths in the feature extraction part and make them "untrainable"
 
 
 
 ########## adding classification layers #########
-
 # add new classifier layers
 flat1 = Flatten()(model.layers[-1].output)
 bn = BatchNormalization()(flat1) #normalize the feature weights 
@@ -194,8 +175,7 @@ model.compile(optimizer=sgd,
 
 
 
-############## FIT & TRAIN #################
-
+################# FIT & TRAIN #################
 #model
 skin_cancer_classifier = model.fit(train_ds,
                     steps_per_epoch= train_ds.samples // batch_size,
@@ -209,8 +189,8 @@ skin_cancer_classifier = model.fit(train_ds,
 
 
 
-############ EVALUATION #####################
-hf.plot_history(skin_cancer_classifier, n_epochs)
+################## EVALUATION #####################
+hf.plot_history_ubal(skin_cancer_classifier, n_epochs)
 
 ################### MODEL PREDICT ########################
 predictions = model.predict(test_ds, # X_test
@@ -224,7 +204,7 @@ report=(classification_report(test_ds.classes, # y_test
 
 print(report)
 # Define outpath for classification report
-outpath_report = os.path.join(os.getcwd(), "out", "classification_report.txt")
+outpath_report = os.path.join(os.getcwd(), "out", "classification_report_unbalanced.txt")
 
 # Save the  classification report
 file = open(outpath_report, "w")

@@ -40,13 +40,7 @@ df['label']= label_list
 df=df.drop(labels, axis=1)
 
 
-#################### FIX UNBALANCED TRAIN DATA #####################
-# Current label distribution (unbalanced)
-print( "***"*15)
-print('Number of data points: ', len(df))
-print('Unbalanced label distribution: ')
-print(df['label'].value_counts()) 
-print( "***"*15)
+#################### CREATE BALANCED DATA #####################
 # sampling to make balanced data
 size=500 #sample if a class has more than 500 data points 
 samples=[]
@@ -61,17 +55,16 @@ for label in df['label'].unique():
     samples.append(sample) 
 lil_df=pd.concat(samples, axis=0).reset_index(drop=True)
 
-# print slightly more balanced data
+
+
+################# TEST AND TRAIN SPLIT - BALANCED DATA ##################
+# print balanced data and label distribution
 print( "***"*15)
-print('Number of data points: ', len(lil_df))
+print('Number of data points in balanced data: ', len(lil_df))
 print('Balanced label distribution: ')  
 print (lil_df['label'].value_counts())  
 print( "***"*15)
 print( "  "*15)
-
-
-
-##################### TEST AND TRAIN SPLIT #####################
 train_split=.70 # percentage of data used for training
 valid_split=.15 # percentage of data used for validation
 
@@ -79,14 +72,46 @@ valid_split=.15 # percentage of data used for validation
 test_val_split = valid_split/(1-train_split) # split of 0.5 
 
 # Splitting data into train df and remaining data
-train_df, remaining_data = train_test_split(lil_df, train_size=train_split, shuffle=True, random_state=188)
+train_df_bal, remaining_data_bal = train_test_split(lil_df, train_size=train_split, shuffle=True, random_state=188)
 
 # Splitting remaining data into validation and test df
-val_df, test_df=train_test_split(remaining_data, train_size= test_val_split, shuffle=True, random_state=188)
+val_df_bal, test_df_bal =train_test_split(remaining_data_bal, train_size= test_val_split, shuffle=True, random_state=188)
 
 # Printing splits
 print( "***"*15)
-print('Current data split: ')  
+print('Current split of balanced data: ')  
+print( "---"*15)
+print('train_df length: ', len(train_df_bal))  
+print( "---"*15)
+print('test_df length: ', len(test_df_bal))
+print( "---"*15)
+print( 'valid_df length: ', len(val_df_bal))
+print( "***"*15)
+
+
+################## TEST AND TRAIN SPLIT - UNBALANCED DATA #################
+# Current label distribution (unbalanced)
+print( "***"*15)
+print('Number of data points in ubalanced data: ', len(df))
+print('Unbalanced label distribution: ')
+print(df['label'].value_counts()) 
+print( "***"*15)
+
+train_split=.70 # percentage of data used for training
+valid_split=.15 # percentage of data used for validation
+
+# percentage of data used for test is 1-train_split-valid_split 
+test_val_split = valid_split/(1-train_split) # split of 0.5 
+
+# Splitting data into train df and remaining data
+train_df_ubal, remaining_data_ubal = train_test_split(df, train_size=train_split, shuffle=True, random_state=188)
+
+# Splitting remaining data into validation and test df
+val_df_ubal, test_df_ubal=train_test_split(remaining_data_ubal, train_size= test_val_split, shuffle=True, random_state=188)
+
+# Printing splits
+print( "***"*15)
+print('Current split of ubalanced data: ')  
 print( "---"*15)
 print('train_df length: ', len(train_df))  
 print( "---"*15)
