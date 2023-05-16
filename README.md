@@ -56,7 +56,7 @@ The ```unzip_data.py``` script located in ```src``` unzips the data into the ```
 <br>
 
 # **4.5 Usage and Reproducibility**
-## **4.5.1 Prerequsities** 
+## **4.5.1 Prerequisites** 
 In order for the user to be able to run the code, please make sure to have bash and python 3 installed on the used device. The code has been written and tested with Python 3.9.2 on a Linux operating system. In order to run the provided code for this assignment, please follow the instructions below.
 
 <br>
