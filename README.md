@@ -182,12 +182,21 @@ From the Accuracy Curve plot, similar noisy tendencies in the validation accurac
 
 
 **[Classification report](out/classification_report_unbalanced.txt)** (open link to see) <br>
-The model shows an accuracy of 76%. Furthermore, the model seems to be best at classifying *blouses*, *nehru jackets*, *lehenga*, and *mojaris for men* with F1 scores of 90%, 85%, 84%, 84% respectively. 
+The model shows an accuracy of 73%. Furthermore, the model seems to be best at classifying *NV*, *VASC*, *MEL*, and *BCC* with F1 scores of 88%, 47%, 44%, and 43% respectively. However, the model is not necessarily exposed to a lot of images within the two diagnostic categories *VASC* and *BCC*. Moreover, it must be noticed that three out of four of the best F1 scores are below chance level. 
 
+The model seems to be worst at classifying *DF*, *AKIEC*, and *BKL* with F1 scores of 0%, 26%, 33% respectively. It makes sense, that the model performs bad on *DF* and *AKIEC* with relatively few images in the test set, and these two diagnostic categories have very sublte features that could resemble other types of skin cancer. However *BKL* has a descent amount of images in the test set, but the model seems to find it hard to predict the diagnostic category accurately. The reason for this may be the same as mentioned in the above *balanced* classification report section.
 
 **Training and validation history plot**
 
 ![Training and validation history plot](out/train_val_history_plot_unbalanced.png)
+
+From the Loss Curve plot, both the validation loss and training loss show similar gradually descending tendencies in their slope with only a little gap between them. This may indicate that there no or little overfitting. There seems to be a little discrepancy between the training loss and validation loss towards the end since the slope of the training loss appears to be reaching a point of stability around 28-29 epochs, indicating that the model is not capable of further learning, while the validation loss seems to be decreasing further. Also the validation loss looks some what noisy, suggesting a unrepresentative validation dataset.
+
+From the Accuracy Curve plot, there are similar tendencies of discrepancy towards the final epochs: the training accuracy seems to have reached a point of stability (no more learning is acquired), while the validation accuracy increase further. Like the Loss Curve plot, the validation accuracy is still very noisy, indicating unrepresentative validation dataset. Moreover, most of the validation accuracy curve is above the training accuracy curve, making it appear as if the model performs better on unseen data than seen data. 
+
+<br>
+
+In summary, the overall accuracy performance of the skin cancer classifier is best using *unbalanced* data, however there are some pitfalls to it as mentioned above. The learning curves of the skin cancer classifier show same poor performance, which overall indicate that the validation dataset must be reconsidered in the data preprocessing steps in the workflow. 
 
 
 <br>
