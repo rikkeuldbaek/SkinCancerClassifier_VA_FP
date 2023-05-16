@@ -4,7 +4,7 @@
 #### Date: 8th of May 2023
 <br>
 
-## **4.1 GitHub link**
+# **4.1 GitHub link**
 
 The following link is a link to the GitHub repository of the self assigned final project in the course Visual Analytics (F23.147201U023.A). Within the GitHub repository all necessary code are provided to reproduce the results of the project. 
 
