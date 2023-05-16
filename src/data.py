@@ -7,7 +7,7 @@
 ################ SKIN CANCER CLASSIFIER ##################
 #--------------------------------------------------------#
 
-# (please note that some of this code has been adapted from class sessions)
+# (please note that some of this code has been adapted from https://www.kaggle.com/code/gpiosenka/efficientnetb5-f1-score-83)
 
 #loading packages
 import numpy as np
