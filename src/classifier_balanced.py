@@ -1,4 +1,4 @@
-### Skin Cancer Classifier
+### Final Project - Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
 # Date: 27th of April 2023
@@ -6,6 +6,8 @@
 #--------------------------------------------------------#
 ################ SKIN CANCER CLASSIFIER ##################
 #--------------------------------------------------------#
+
+# (please note that some of this code has been adapted from class sessions)
 
 # Install packages
 # path tools

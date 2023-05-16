@@ -1,4 +1,4 @@
-### Skin Cancer Model
+### Final Project - Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
 # Date: 8th of May 2023
@@ -7,10 +7,11 @@
 ###################### UNZIP DATA ########################
 #--------------------------------------------------------#
 
+# (please note that some of this code has been adapted from class sessions)
+
 #import zipfile module and pandas
 from zipfile import ZipFile
 import os
-#import pandas as pd
 
 ##################### UNZIPPING #######################
 

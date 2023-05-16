@@ -1,4 +1,4 @@
-### Skin Cancer Classifier
+### Final Project - Skin Cancer Classifier
 ## Cultural Data Science - Visual Analytics 
 # Author: Rikke Uldbæk (202007501)
 # Date: 27th of April 2023
@@ -221,10 +221,9 @@ def fitting_model(model, train_ds, n_epochs, val_ds, monitor, patience, restore_
                         validation_data=train_ds,
                         validation_steps= val_ds.samples // batch_size,
                         batch_size = batch_size,
-                        verbose = 1)
-                        #,
-                        #callbacks=[EarlyStopping(monitor=monitor, patience=patience, restore_best_weights =  restore_best_weights)]
-                        #)
+                        verbose = 1,
+                        callbacks=[EarlyStopping(monitor=monitor, patience=patience, restore_best_weights =  restore_best_weights)]
+                        )
 
     return skin_cancer_classifier, model
 
