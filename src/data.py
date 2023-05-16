@@ -128,7 +128,7 @@ def split_balanced_data(lil_df, train_split_bal, val_split_bal):
 def split_unbalanced_data(df, train_split_ubal, val_split_ubal):
     # Current label distribution (unbalanced)
     print( "***"*15)
-    print('Number of data points in ubalanced data: ', len(df))
+    print('Number of data points in unbalanced data: ', len(df))
     print('Unbalanced label distribution: ')
     print(df['label'].value_counts()) 
     print( "***"*15)
@@ -148,7 +148,7 @@ def split_unbalanced_data(df, train_split_ubal, val_split_ubal):
 
     # Printing splits
     print( "***"*15)
-    print('Current split of ubalanced data: ')  
+    print('Current split of unbalanced data: ')  
     print( "---"*15)
     print('train_df length: ', len(train_df_ubal))  
     print( "---"*15)

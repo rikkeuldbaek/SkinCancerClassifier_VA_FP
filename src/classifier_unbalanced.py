@@ -7,6 +7,8 @@
 ################ SKIN CANCER CLASSIFIER ##################
 #--------------------------------------------------------#
 
+# (please note that some of this code has been adapted from class sessions)
+
 # Install packages
 # path tools
 import os, sys
@@ -95,7 +97,7 @@ def input_parse():
 #load in data
 args = dt.input_parse()
 df = dt.data_preprocessing()
-train_df_ubal, test_df_ubal, val_df_ubal = dt.split_balanced_data(df, args.train_split_ubal, args.val_split_ubal)
+train_df_ubal, test_df_ubal, val_df_ubal = dt.split_unbalanced_data(df, args.train_split_ubal, args.val_split_ubal)
 train_df, test_df, val_df = train_df_ubal, test_df_ubal, val_df_ubal
 
 
@@ -219,9 +221,10 @@ def fitting_model(model, train_ds, n_epochs, val_ds, monitor, patience, restore_
                         validation_data=train_ds,
                         validation_steps= val_ds.samples // batch_size,
                         batch_size = batch_size,
-                        verbose = 1,
-                        callbacks=[EarlyStopping(monitor=monitor, patience=patience, restore_best_weights =  restore_best_weights)]
-                        )
+                        verbose = 1)
+                        #,
+                        #callbacks=[EarlyStopping(monitor=monitor, patience=patience, restore_best_weights =  restore_best_weights)]
+                        #)
 
     return skin_cancer_classifier, model
 
